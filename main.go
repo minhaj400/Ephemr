@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/Minhajxdd/Ephemr/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -21,6 +22,8 @@ func main() {
 
 	router := gin.New()
 	router.Use(gin.Logger())
+
+	routes.AuthRouter(router)
 
 	router.Run(":" + PORT)
 
