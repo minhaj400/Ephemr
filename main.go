@@ -9,6 +9,7 @@ import (
 func main() {
 	config.LoadEnv()
 	config.Init()
+	config.ConnectDB()
 
 	router := gin.New()
 	router.Use(gin.Logger())
