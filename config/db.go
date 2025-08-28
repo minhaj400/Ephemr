@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-var DB *sql.DB
+var DB *gorm.DB
 
 func ConnectDB() {
 	var dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
@@ -41,5 +41,5 @@ func ConnectDB() {
 
 	fmt.Println("Connected to Database..")
 
-	DB = sqlDB
+	DB = db
 }
