@@ -14,7 +14,8 @@ func main() {
 	router := gin.New()
 	router.Use(gin.Logger())
 
-	routes.AuthRouter(router)
+	api := router.Group("/api/v1")
+	routes.MainRouter(api)
 
 	router.Run(":" + config.Cfg.Port)
 
