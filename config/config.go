@@ -5,7 +5,8 @@ import (
 )
 
 type Config struct {
-	Port string
+	Port       string
+	JwtSecret string
 	Database
 }
 
@@ -21,7 +22,8 @@ var Cfg *Config
 
 func Init() {
 	Cfg = &Config{
-		Port: os.Getenv("PORT"),
+		Port:       os.Getenv("PORT"),
+		JwtSecret: os.Getenv("JWT_SECRET"),
 		Database: Database{
 			DB_USER:     os.Getenv("DB_USER"),
 			DB_PWD:      os.Getenv("DB_PWD"),
