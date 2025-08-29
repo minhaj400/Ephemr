@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 
 	"github.com/Minhajxdd/Ephemr/config"
 	"github.com/Minhajxdd/Ephemr/controllers"

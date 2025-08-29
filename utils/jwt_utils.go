@@ -14,16 +14,12 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-var (
-	JwtSecret = []byte(config.Cfg.JwtSecret)
-)
-
 func CreateToken(payload Claims) (string, error) {
 	payload.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Minute * 30))
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
 
-	signedToken, err := token.SignedString(JwtSecret)
+	signedToken, err := token.SignedString(config.Cfg.JwtSecret)
 	if err != nil {
 		return "", err
 	}
@@ -35,7 +31,7 @@ func VerifyToken(tokenString string) (*Claims, error) {
 	claims := &Claims{}
 
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return JwtSecret, nil
+		return config.Cfg.JwtSecret, nil
 	})
 
 	if err != nil {
