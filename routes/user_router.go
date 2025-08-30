@@ -10,9 +10,7 @@ import (
 )
 
 func UserRoutes(router *gin.RouterGroup) {
-	userRepo := repositories.NewUserRepository(config.DB)
-	userService := services.NewUserService(userRepo)
-	userController := controllers.NewUserController(userService)
+	userController := controllers.NewUserController()
 	auth := router.Group("/auth")
 	{
 		auth.POST("/signup", userController.Signup)

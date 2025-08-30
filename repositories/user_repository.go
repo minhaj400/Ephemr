@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"github.com/Minhajxdd/Ephemr/config"
 	"github.com/Minhajxdd/Ephemr/models"
 	"gorm.io/gorm"
 )
@@ -14,8 +15,8 @@ type userRepository struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) UserRepository {
-	return &userRepository{db: db}
+func NewUserRepository() UserRepository {
+	return &userRepository{db: config.DB}
 }
 
 func (r *userRepository) Create(user *models.User) error {

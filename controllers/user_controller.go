@@ -24,8 +24,8 @@ type UserController struct {
 	userService services.UserService
 }
 
-func NewUserController(s services.UserService) *UserController {
-	return &UserController{userService: s}
+func NewUserController() *UserController {
+	return &UserController{userService: services.NewUserService()}
 }
 
 func (ctrl *UserController) Signup(c *gin.Context) {
