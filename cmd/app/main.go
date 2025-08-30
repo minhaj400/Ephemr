@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/Minhajxdd/Ephemr/config"
 	"github.com/Minhajxdd/Ephemr/internal/app"
+	"github.com/Minhajxdd/Ephemr/internal/config"
 	"github.com/Minhajxdd/Ephemr/internal/routes"
 	"github.com/gin-gonic/gin"
 )

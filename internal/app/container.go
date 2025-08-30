@@ -3,7 +3,7 @@ package app
 import (
 	"time"
 
-	"github.com/Minhajxdd/Ephemr/config"
+	"github.com/Minhajxdd/Ephemr/internal/config"
 	"github.com/Minhajxdd/Ephemr/internal/auth"
 	"github.com/Minhajxdd/Ephemr/internal/user"
 	"github.com/Minhajxdd/Ephemr/pkg/crypto"
