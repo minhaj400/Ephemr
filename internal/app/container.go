@@ -3,8 +3,9 @@ package app
 import (
 	"time"
 
-	"github.com/Minhajxdd/Ephemr/internal/config"
 	"github.com/Minhajxdd/Ephemr/internal/auth"
+	"github.com/Minhajxdd/Ephemr/internal/config"
+	"github.com/Minhajxdd/Ephemr/internal/database"
 	"github.com/Minhajxdd/Ephemr/internal/user"
 	"github.com/Minhajxdd/Ephemr/pkg/crypto"
 	"github.com/Minhajxdd/Ephemr/pkg/jwt"
@@ -21,7 +22,7 @@ type Container struct {
 }
 
 func NewContainer() *Container {
-	gormDB := config.DB
+	gormDB := database.DB
 
 	hasher := crypto.NewBcryptHasher(14)
 	jwtMgr := jwt.NewJWTManager(config.Cfg.JwtSecret, time.Minute*30)

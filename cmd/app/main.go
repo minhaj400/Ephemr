@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/Minhajxdd/Ephemr/internal/app"
 	"github.com/Minhajxdd/Ephemr/internal/config"
+	"github.com/Minhajxdd/Ephemr/internal/database"
 	"github.com/Minhajxdd/Ephemr/internal/routes"
 	"github.com/gin-gonic/gin"
 )
@@ -10,7 +11,7 @@ import (
 func main() {
 	config.LoadEnv()
 	config.Init()
-	config.ConnectDB()
+	database.ConnectDB()
 
 	router := gin.New()
 	router.Use(gin.Logger())

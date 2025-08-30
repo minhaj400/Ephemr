@@ -1,10 +1,11 @@
-package config
+package database
 
 import (
 	"fmt"
 	"log"
 	"time"
 
+	"github.com/Minhajxdd/Ephemr/internal/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -13,11 +14,11 @@ var DB *gorm.DB
 
 func ConnectDB() {
 	var dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
-		Cfg.DB_HOST,
-		Cfg.DB_USER,
-		Cfg.DB_PWD,
-		Cfg.DB_DATABASE,
-		Cfg.DB_PORT,
+		config.Cfg.DB_HOST,
+		config.Cfg.DB_USER,
+		config.Cfg.DB_PWD,
+		config.Cfg.DB_DATABASE,
+		config.Cfg.DB_PORT,
 	)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
