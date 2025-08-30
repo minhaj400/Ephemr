@@ -11,7 +11,7 @@ type Module struct {
 	Controller *controller.UserController
 }
 
-func NewUserModule(db *gorm.DB) *Module {
+func NewModule(db *gorm.DB) *Module {
 	repo := repositories.NewUserRepository(db)
 	srv := service.NewUserService(&repo)
 	ctrl := controller.NewUserService(&srv)
