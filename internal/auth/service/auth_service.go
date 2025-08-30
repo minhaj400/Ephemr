@@ -1,4 +1,4 @@
-package services
+package service
 
 import (
 	"errors"
@@ -21,8 +21,8 @@ type authService struct {
 	jwtManager jwt.TokenManager
 }
 
-func NewAuthService(r repositories.UserRepository, h crypto.PasswordHasher) AuthService {
-	return &authService{userRepo: r, hasher: h}
+func NewAuthService(r repositories.UserRepository, h crypto.PasswordHasher, j jwt.TokenManager) AuthService {
+	return &authService{userRepo: r, hasher: h, jwtManager: j}
 }
 
 func (s *authService) SignUp(user *dto.SignUpRequest) (*model.User, string, error) {

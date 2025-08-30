@@ -8,7 +8,8 @@ import (
 )
 
 type Module struct {
-	Controller *controller.UserController
+	UserController *controller.UserController
+	UserRepository *repositories.UserRepository
 }
 
 func NewModule(db *gorm.DB) *Module {
@@ -17,6 +18,7 @@ func NewModule(db *gorm.DB) *Module {
 	ctrl := controller.NewUserService(&srv)
 
 	return &Module{
-		Controller: &ctrl,
+		UserController: &ctrl,
+		UserRepository: &repo,
 	}
 }

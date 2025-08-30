@@ -28,13 +28,14 @@ func NewContainer() *Container {
 	jwtMgr := jwt.NewJWTManager(config.Cfg.JwtSecret, time.Minute*30)
 
 	userMod := user.NewModule(gormDB)
-	// authMod := auth.NewModule(gormDB) // auth depends on user repo
+
+	authMod := auth.NewModule(userMod.UserRepository, hasher, jwtMgr)
 
 	return &Container{
 		DB:         gormDB,
 		Hasher:     hasher,
 		JWTManager: jwtMgr,
 		UserModule: userMod,
-		// AuthModule: authMod,
+		AuthModule: authMod,
 	}
 }
