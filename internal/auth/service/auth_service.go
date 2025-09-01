@@ -1,13 +1,14 @@
 package service
 
 import (
-	"errors"
 	"strconv"
 
 	"github.com/Minhajxdd/Ephemr/internal/auth/dto"
+	"github.com/Minhajxdd/Ephemr/internal/auth/errors"
 	"github.com/Minhajxdd/Ephemr/internal/user/model"
 	repositories "github.com/Minhajxdd/Ephemr/internal/user/repository"
 	"github.com/Minhajxdd/Ephemr/pkg/crypto"
+	"github.com/Minhajxdd/Ephemr/pkg/errs"
 	"github.com/Minhajxdd/Ephemr/pkg/jwt"
 )
 
@@ -29,15 +30,25 @@ func (s *authService) SignUp(user *dto.SignUpRequest) (*model.User, string, erro
 	existingUser, err := s.userRepo.FindByEmail(user.Email)
 
 	if err != nil {
-		return nil, "", nil
+		return nil, "", err
 	}
 	if existingUser != nil {
-		return nil, "", errors.New("user with email already exists")
+		return nil, "", errs.New(
+			errors.UserDuplicateEmail,
+			"user with email already exists",
+			400,
+			nil,
+		)
 	}
 
 	hashedPassword, err := s.hasher.Hash(user.Password)
 	if err != nil {
-		return nil, "", errors.New("invalid password")
+		return nil, "", errs.New(
+			errors.InvalidPassword,
+			"invalid password",
+			400,
+			nil,
+		)
 	}
 
 	newUser := &model.User{
@@ -49,7 +60,7 @@ func (s *authService) SignUp(user *dto.SignUpRequest) (*model.User, string, erro
 	err = s.userRepo.Create(newUser)
 
 	if err != nil {
-		return nil, "", errors.New("something went wrong")
+		return nil, "", err
 	}
 
 	newUser.Password = ""
@@ -62,7 +73,7 @@ func (s *authService) SignUp(user *dto.SignUpRequest) (*model.User, string, erro
 	token, err := s.jwtManager.Generate(*claims)
 
 	if err != nil {
-		return nil, "", errors.New("somethign went wrong")
+		return nil, "", err
 	}
 
 	return newUser, token, nil

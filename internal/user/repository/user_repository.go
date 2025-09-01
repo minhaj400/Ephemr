@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"errors"
+
 	"github.com/Minhajxdd/Ephemr/internal/user/model"
 	"gorm.io/gorm"
 )
@@ -26,6 +28,9 @@ func (r *userRepo) Create(u *model.User) error {
 func (r *userRepo) FindByEmail(email string) (*model.User, error) {
 	var u model.User
 	if err := r.db.Where(&model.User{Email: email}).First(&u).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return &u, nil

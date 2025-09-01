@@ -2,10 +2,11 @@ package controller
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/Minhajxdd/Ephemr/internal/auth/dto"
 	services "github.com/Minhajxdd/Ephemr/internal/auth/service"
+	"github.com/Minhajxdd/Ephemr/pkg/errs"
+	"github.com/Minhajxdd/Ephemr/pkg/response"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,20 +25,18 @@ func NewAuthController(a services.AuthService) AuthController {
 func (c *authController) SignUp(ctx *gin.Context) {
 	var body dto.SignUpRequest
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.HandleError(ctx, errs.FromValidation(err))
 		return
 	}
 
 	newUser, token, err := c.authService.SignUp(&body)
 
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.HandleError(ctx, err)
 		return
 	}
 
 	ctx.Header("Authorization", fmt.Sprintf("Bearer %s", token))
 
-	ctx.JSON(http.StatusCreated, gin.H{
-		"data": newUser,
-	})
+	response.Success(ctx, "user created successfully", newUser)
 }
