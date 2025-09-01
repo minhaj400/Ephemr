@@ -8,6 +8,6 @@ import (
 )
 
 func Setup(api *gin.RouterGroup, c *app.Container) {
-	auth.RegisterAuthRoutes(api, *c.AuthModule.AuthController)
+	auth.RegisterAuthRoutes(api, c.AuthModule.AuthController)
 	user.RegisterUserRoutes(api, c.UserModule.UserController)
 }

@@ -9,14 +9,14 @@ import (
 )
 
 type Module struct {
-	AuthController *controller.AuthController
+	AuthController controller.AuthController
 }
 
-func NewModule(r *repositories.UserRepository, h crypto.PasswordHasher, j jwt.TokenManager) *Module {
-	srv := service.NewAuthService(*r, h, j)
+func NewModule(r repositories.UserRepository, h crypto.PasswordHasher, j jwt.TokenManager) *Module {
+	srv := service.NewAuthService(r, h, j)
 	ctrl := controller.NewAuthController(srv)
 
 	return &Module{
-		AuthController: &ctrl,
+		AuthController: ctrl,
 	}
 }

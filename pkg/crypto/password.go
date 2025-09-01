@@ -7,15 +7,15 @@ type PasswordHasher interface {
 	Compare(password, hash string) bool
 }
 
-type BcryptHasher struct {
+type bcryptHasher struct {
 	cost int
 }
 
 func NewBcryptHasher(cost int) PasswordHasher {
-	return &BcryptHasher{cost: cost}
+	return &bcryptHasher{cost: cost}
 }
 
-func (b *BcryptHasher) Hash(password string) (string, error) {
+func (b *bcryptHasher) Hash(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), b.cost)
 	if err != nil {
 		return "", err
@@ -23,7 +23,7 @@ func (b *BcryptHasher) Hash(password string) (string, error) {
 	return string(bytes), nil
 }
 
-func (b *BcryptHasher) Compare(password, hash string) bool {
+func (b *bcryptHasher) Compare(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }

@@ -8,17 +8,17 @@ import (
 )
 
 type Module struct {
-	UserController *controller.UserController
-	UserRepository *repositories.UserRepository
+	UserController controller.UserController
+	UserRepository repositories.UserRepository
 }
 
 func NewModule(db *gorm.DB) *Module {
 	repo := repositories.NewUserRepository(db)
-	srv := service.NewUserService(&repo)
-	ctrl := controller.NewUserService(&srv)
+	srv := service.NewUserService(repo)
+	ctrl := controller.NewUserService(srv)
 
 	return &Module{
-		UserController: &ctrl,
-		UserRepository: &repo,
+		UserController: ctrl,
+		UserRepository: repo,
 	}
 }
