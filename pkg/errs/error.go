@@ -3,6 +3,9 @@ package errs
 import (
 	"errors"
 	"fmt"
+	"net/http"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type AppError struct {
@@ -34,4 +37,29 @@ func From(err error) (*AppError, bool) {
 		return appErr, true
 	}
 	return nil, false
+}
+
+func InternalError(internal error) *AppError {
+	return New("INTERNAL_SERVER_ERROR", "Something went wrong", http.StatusInternalServerError, internal)
+}
+
+func NotFound(message string, internal error) *AppError {
+	return New("NOT_FOUND", message, http.StatusNotFound, internal)
+}
+
+func BadRequest(message string, internal error) *AppError {
+	return New("BAD_REQUEST", message, http.StatusBadRequest, internal)
+}
+
+func FromValidation(err error) *AppError {
+	if verrs, ok := err.(validator.ValidationErrors); ok && len(verrs) > 0 {
+		vErr := verrs[0]
+		field := vErr.Field()
+		tag := vErr.Tag()
+
+		msg := fmt.Sprintf("%s is %s", field, tag)
+		return New(ValidationError, msg, http.StatusBadRequest, nil)
+	}
+
+	return BadRequest("Invalid request payload", err)
 }

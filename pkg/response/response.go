@@ -53,11 +53,12 @@ func HandleError(ctx *gin.Context, err error) {
 		return
 	}
 
+	//here implement robust error handler
 	log.Printf("[ERROR] %v", err)
 	ctx.JSON(http.StatusInternalServerError, BaseResponse{
 		Success: false,
 		Error: &ErrorInfo{
-			Code:    "INTERNAL_SERVER_ERROR",
+			Code:    errs.InternalServerError,
 			Details: "Something went wrong",
 		},
 	})
