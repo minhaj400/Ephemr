@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"fmt"
-
 	"github.com/Minhajxdd/Ephemr/internal/auth/dto"
 	services "github.com/Minhajxdd/Ephemr/internal/auth/service"
 	"github.com/Minhajxdd/Ephemr/pkg/errs"
@@ -29,14 +27,12 @@ func (c *authController) SignUp(ctx *gin.Context) {
 		return
 	}
 
-	newUser, token, err := c.authService.SignUp(&body)
+	newUser, err := c.authService.SignUp(&body)
 
 	if err != nil {
 		response.HandleError(ctx, err)
 		return
 	}
 
-	ctx.Header("Authorization", fmt.Sprintf("Bearer %s", token))
-
-	response.Success(ctx, "user created successfully", newUser)
+	response.Success(ctx, "Verification Mail Sent", newUser)
 }

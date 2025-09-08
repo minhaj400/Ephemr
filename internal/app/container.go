@@ -29,7 +29,7 @@ func NewContainer() *Container {
 
 	userMod := user.NewModule(gormDB)
 
-	authMod := auth.NewModule(userMod.UserRepository, hasher, jwtMgr)
+	authMod := auth.NewModule(userMod.UserRepository, gormDB, hasher, jwtMgr)
 
 	return &Container{
 		DB:         gormDB,

@@ -7,6 +7,7 @@ import (
 type Config struct {
 	Port         string
 	JwtSecret    string
+	HostName     string
 	GmailId      string
 	GmailAppPass string
 	Database
@@ -28,6 +29,7 @@ func Init() {
 		JwtSecret:    os.Getenv("JWT_SECRET"),
 		GmailId:      os.Getenv("GMAIL_ID"),
 		GmailAppPass: os.Getenv("GMAIL_APP_PASS"),
+		HostName:     os.Getenv("HOST_NAME"),
 		Database: Database{
 			DB_USER:     os.Getenv("DB_USER"),
 			DB_PWD:      os.Getenv("DB_PWD"),
