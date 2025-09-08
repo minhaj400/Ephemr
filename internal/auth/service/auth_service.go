@@ -5,6 +5,7 @@ import (
 
 	"github.com/Minhajxdd/Ephemr/internal/auth/dto"
 	"github.com/Minhajxdd/Ephemr/internal/auth/errors"
+	"github.com/Minhajxdd/Ephemr/internal/auth/utils"
 	"github.com/Minhajxdd/Ephemr/internal/user/model"
 	repositories "github.com/Minhajxdd/Ephemr/internal/user/repository"
 	"github.com/Minhajxdd/Ephemr/pkg/crypto"
@@ -18,12 +19,13 @@ type AuthService interface {
 
 type authService struct {
 	userRepo   repositories.UserRepository
+	emailUtils utils.AuthEmailUtils
 	hasher     crypto.PasswordHasher
 	jwtManager jwt.TokenManager
 }
 
-func NewAuthService(r repositories.UserRepository, h crypto.PasswordHasher, j jwt.TokenManager) AuthService {
-	return &authService{userRepo: r, hasher: h, jwtManager: j}
+func NewAuthService(r repositories.UserRepository, e utils.AuthEmailUtils, h crypto.PasswordHasher, j jwt.TokenManager) AuthService {
+	return &authService{userRepo: r, emailUtils: e, hasher: h, jwtManager: j}
 }
 
 func (s *authService) SignUp(user *dto.SignUpRequest) (*model.User, string, error) {

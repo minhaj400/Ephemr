@@ -1,6 +1,49 @@
 package utils
 
-func buildVerifyEmailBody(magicLink string) string {
+import (
+	"log"
+	"net/smtp"
+
+	"github.com/Minhajxdd/Ephemr/internal/config"
+)
+
+type AuthEmailUtils interface {
+	buildConfirmEmailBody(magicLink string) string
+	SentConfirmEmail(to, magicLink string) error
+}
+
+type emailUtils struct{}
+
+func NewAuthEmailUtils() AuthEmailUtils {
+	return &emailUtils{}
+}
+
+func (e *emailUtils) SentConfirmEmail(to, magicLink string) error {
+
+	from := config.Cfg.GmailId
+	pass := config.Cfg.GmailAppPass
+
+	msg := "From: " + from + "\r\n" +
+		"To: " + to + "\r\n" +
+		"Subject: [Ephemr] Confirm Email\r\n" +
+		"MIME-version: 1.0;\r\n" +
+		"Content-Type: text/html; charset=\"UTF-8\";\r\n" +
+		"\r\n" +
+		e.buildConfirmEmailBody(magicLink)
+
+	err := smtp.SendMail("smtp.gmail.com:587",
+		smtp.PlainAuth("", from, pass, "smtp.gmail.com"),
+		from, []string{to}, []byte(msg))
+
+	if err != nil {
+		log.Printf("smtp error: %s", err)
+		return err
+	}
+
+	return nil
+}
+
+func (e *emailUtils) buildConfirmEmailBody(magicLink string) string {
 	return `
 		<html>
 		<head>
@@ -42,8 +85,8 @@ func buildVerifyEmailBody(magicLink string) string {
 				<!-- Body -->
 				<tr>
 					<td class="content" style="padding:32px 28px 24px;">
-					<h1 style="margin:0 0 12px;font-size:22px;line-height:28px;color:#0f1724;font-weight:700;">Verify Your Email</h1>
-					<p style="margin:0 0 20px;color:#374151;line-height:1.5;font-size:15px;">We received a request to sign in to <strong>Ephemr</strong>. Click the button below to verify sign in. This link will expire in <strong>15 minutes</strong>.</p>
+					<h1 style="margin:0 0 12px;font-size:22px;line-height:28px;color:#0f1724;font-weight:700;">Confirm Your Email</h1>
+					<p style="margin:0 0 20px;color:#374151;line-height:1.5;font-size:15px;">We received a request to sign in to <strong>Ephemr</strong>. Click the button below to confirm sign in. This link will expire in <strong>15 minutes</strong>.</p>
 
 					<!-- Button (use VML for Outlook fallback) -->
 					<table role="presentation" cellpadding="0" cellspacing="0" style="margin:22px 0 18px;">
@@ -64,7 +107,7 @@ func buildVerifyEmailBody(magicLink string) string {
 
 					<p style="margin:0 0 14px;color:#6b7280;font-size:13px;">If the button doesn't work, copy and paste this URL into your browser:</p>
 					<p style="margin:0 0 18px;word-break:break-all;font-size:13px;color:#0f1724;">
-						<a href=" ` + magicLink + ` " style="color:#2563eb;">{{MAGIC_LINK}}</a>
+						<a href=" ` + magicLink + ` " style="color:#2563eb;">` + magicLink + `</a>
 					</p>
 
 					<hr style="border:none;border-top:1px solid #eef1f5;margin:20px 0;">
