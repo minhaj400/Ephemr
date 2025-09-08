@@ -5,8 +5,9 @@ import (
 	"log"
 	"time"
 
-	user "github.com/Minhajxdd/Ephemr/internal/user/model"
+	auth "github.com/Minhajxdd/Ephemr/internal/auth/model"
 	"github.com/Minhajxdd/Ephemr/internal/config"
+	user "github.com/Minhajxdd/Ephemr/internal/user/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -29,7 +30,7 @@ func ConnectDB() {
 		log.Fatal("Error Connecting To Database")
 	}
 
-	err = db.AutoMigrate(&user.User{})
+	err = db.AutoMigrate(&user.User{}, &auth.EmailToken{})
 	if err != nil {
 		log.Fatal("failed to migrate database: ", err)
 	}
