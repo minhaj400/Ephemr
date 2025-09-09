@@ -23,6 +23,7 @@ import (
 
 type AuthService interface {
 	SignUp(user *dto.SignUpRequest) (*model.User, error)
+	ConfirmEmail(params *dto.ConfirmEmailRequest) (string, error)
 }
 
 type authService struct {
@@ -98,4 +99,61 @@ func (s *authService) SignUp(user *dto.SignUpRequest) (*model.User, error) {
 	s.emailUtils.SentConfirmEmail(newUser.Email, magicLink)
 
 	return newUser, nil
+}
+
+func (s *authService) ConfirmEmail(params *dto.ConfirmEmailRequest) (string, error) {
+	token, err := s.emailTokenRepo.IsValid(params.UserId, params.Token, authmodel.TokenKindVerify)
+
+	if err != nil {
+		return "", errs.InternalError(err)
+	}
+
+	if token == nil {
+		return "", errs.New(
+			errors.InvalidToken,
+			"invalid token",
+			400,
+			nil,
+		)
+	}
+
+	currentTime := time.Now()
+	isExpired := token.ExpiresAt.Before(currentTime)
+
+	if isExpired {
+		if err := s.emailTokenRepo.DeleteById(token.ID); err != nil {
+			return "", errs.InternalError(err)
+		}
+
+		return "", errs.New(
+			errors.TokenExpired,
+			"token expired",
+			400,
+			nil,
+		)
+	}
+
+	if err := s.emailTokenRepo.DeleteById(token.ID); err != nil {
+		return "", errs.InternalError(err)
+	}
+
+	updatedUser, err := s.userRepo.SetVerifyStatus(params.UserId, true)
+
+	if err != nil {
+		return "", errs.InternalError(err)
+	}
+
+	userId := strconv.FormatUint(uint64(updatedUser.ID), 10)
+	var claims = jwt.Claims{
+		UserID: userId,
+		Role:   "user",
+	}
+
+	jwtToken, err := s.jwtManager.Generate(claims)
+
+	if err != nil {
+		return "", errs.InternalError(err)
+	}
+
+	return jwtToken, nil
 }
