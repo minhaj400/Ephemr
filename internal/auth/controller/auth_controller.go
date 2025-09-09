@@ -10,6 +10,7 @@ import (
 
 type AuthController interface {
 	SignUp(ctx *gin.Context)
+	ConfirmEmail(ctx *gin.Context)
 }
 
 type authController struct {
@@ -35,4 +36,20 @@ func (c *authController) SignUp(ctx *gin.Context) {
 	}
 
 	response.Success(ctx, "Verification Mail Sent", newUser)
+}
+
+func (c *authController) ConfirmEmail(ctx *gin.Context) {
+	var params dto.ConfirmEmailRequest
+	if err := ctx.ShouldBindUri(&params); err != nil {
+		response.HandleError(ctx, errs.FromValidation(err))
+		return
+	}
+
+	_, err := c.authService.ConfirmEmail(&params)
+
+	if err != nil {
+		response.HandleError(ctx, err)
+		return
+	}
+
 }
