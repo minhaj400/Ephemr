@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/Minhajxdd/Ephemr/internal/auth/dto"
@@ -90,7 +91,9 @@ func (s *authService) SignUp(user *dto.SignUpRequest) (*model.User, error) {
 		return nil, errs.InternalError(err)
 	}
 
-	magicLink := fmt.Sprintf("%s/verify-email/%s", config.Cfg.HostName, emailTokenHash)
+	userId := strconv.FormatUint(uint64(newUser.ID), 10)
+
+	magicLink := fmt.Sprintf("%s/verify-email/%s/%s", config.Cfg.HostName, userId, emailTokenHash)
 
 	s.emailUtils.SentConfirmEmail(newUser.Email, magicLink)
 
