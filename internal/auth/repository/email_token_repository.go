@@ -42,9 +42,17 @@ func (r *emailTokenRepo) IsValid(userId uint, tokenHash string, kind model.Token
 }
 
 func (r *emailTokenRepo) DeleteById(id uint) error {
-	err := r.db.Delete(&model.EmailToken{}, id)
-	if errors.Is(err.Error, gorm.ErrRecordNotFound) {
-		return nil
-	}
-	return err.Error
+    result := r.db.Delete(&model.EmailToken{}, id)
+
+    if result.Error != nil {
+        return result.Error
+    }
+
+    if result.RowsAffected == 0 {
+        return nil
+    }
+
+    return nil
 }
+
+

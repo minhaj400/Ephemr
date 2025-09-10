@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"fmt"
+
 	"github.com/Minhajxdd/Ephemr/internal/auth/dto"
 	services "github.com/Minhajxdd/Ephemr/internal/auth/service"
 	"github.com/Minhajxdd/Ephemr/pkg/errs"
@@ -45,11 +47,14 @@ func (c *authController) ConfirmEmail(ctx *gin.Context) {
 		return
 	}
 
-	_, err := c.authService.ConfirmEmail(&params)
+	token, err := c.authService.ConfirmEmail(&params)
 
 	if err != nil {
 		response.HandleError(ctx, err)
 		return
 	}
 
+	ctx.Header("Authorization", fmt.Sprintf("Bearer %s", token))
+
+	response.Success(ctx, "Confirmed Email Successfully", nil)
 }
