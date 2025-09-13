@@ -66,4 +66,25 @@ func (c *authController) ConfirmEmail(ctx *gin.Context) {
 
 func (c *authController) RefreshToken(ctx *gin.Context) {
 
+	var device = ctx.GetHeader("user-agent")
+	var ipAddress = ctx.ClientIP()
+	var refreshToken, err = ctx.Cookie("refresh_token")
+
+	if err != nil {
+		response.HandleError(ctx, errs.InternalError(err))
+		return
+	}
+
+	token, refreshToken, err := c.authService.RefreshToken(refreshToken, device, ipAddress)
+
+	if err != nil {
+		response.HandleError(ctx, err)
+		return
+	}
+
+	ctx.SetCookie("access_token", token, 900, "/", config.Cfg.HostName, false, false)
+
+	ctx.SetCookie("refresh_token", refreshToken, 7*24*3600, "/", config.Cfg.HostName, false, true)
+
+	response.Success(ctx, "Confirmed Email Successfully", nil)
 }
