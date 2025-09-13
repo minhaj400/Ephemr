@@ -40,6 +40,9 @@ func (r *userRepo) FindByEmail(email string) (*model.User, error) {
 func (r *userRepo) GetByID(id uint) (*model.User, error) {
 	var u model.User
 	if err := r.db.First(&u, id).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return &u, nil
