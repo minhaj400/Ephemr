@@ -91,5 +91,22 @@ func (c *authController) RefreshToken(ctx *gin.Context) {
 }
 
 func (c *authController) Login(ctx *gin.Context) {
+	var body dto.LoginRequest
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		response.HandleError(ctx, errs.FromValidation(err))
+		return
+	}
 
+	token, refreshToken, err := c.authService.Login(&body)
+
+	if err != nil {
+		response.HandleError(ctx, err)
+		return
+	}
+
+	ctx.SetCookie("access_token", token, 900, "/", config.Cfg.HostName, false, false)
+
+	ctx.SetCookie("refresh_token", refreshToken, 7*24*3600, "/", config.Cfg.HostName, false, true)
+
+	response.Success(ctx, "Logged In Successfully", nil)
 }
