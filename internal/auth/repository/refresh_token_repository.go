@@ -9,6 +9,7 @@ import (
 
 type RefreshTokenRepository interface {
 	Create(rt *model.RefreshTokens) error
+	Update(rt *model.RefreshTokens) error
 	FindWithTokenDeviceIp(token, device, ipAddress string) (*model.RefreshTokens, error)
 }
 
@@ -22,6 +23,10 @@ func NewRefreshTokenRepo(db *gorm.DB) RefreshTokenRepository {
 
 func (r *refreshTokenRepo) Create(rt *model.RefreshTokens) error {
 	return r.db.Create(rt).Error
+}
+
+func (r *refreshTokenRepo) Update(rt *model.RefreshTokens) error {
+	return r.db.Save(rt).Error
 }
 
 func (r *refreshTokenRepo) FindWithTokenDeviceIp(token, device, ipAddress string) (*model.RefreshTokens, error) {
