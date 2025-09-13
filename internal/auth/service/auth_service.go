@@ -26,6 +26,7 @@ type AuthService interface {
 	SignUp(user *dto.SignUpRequest) (*model.User, error)
 	ConfirmEmail(params *dto.ConfirmEmailRequest, device, ipAddress string) (string, string, error)
 	RefreshToken(token, device, ipAddress string) (string, string, error)
+	Login(user *dto.LoginRequest, device, ipAddress string) (string, string, error)
 }
 
 type authService struct {
@@ -109,6 +110,62 @@ func (s *authService) SignUp(user *dto.SignUpRequest) (*model.User, error) {
 	s.emailUtils.SentConfirmEmail(newUser.Email, magicLink)
 
 	return newUser, nil
+}
+
+func (s *authService) Login(u *dto.LoginRequest, device, ipAddress string) (string, string, error) {
+	user, err := s.userRepo.FindByEmail(u.Email)
+
+	if err != nil {
+		return "", "", errs.InternalError(err)
+	}
+
+	if user == nil || !user.IsVerified {
+		return "", "", errs.New(
+			errors.InvalidPasswordOrUser,
+			"Invalid Password Or User",
+			http.StatusBadRequest,
+			nil,
+		)
+	}
+
+	if isValidPassword := s.hasher.Compare(u.Password, user.Password); !isValidPassword {
+		return "", "", errs.New(
+			errors.InvalidPasswordOrUser,
+			"Invalid Password Or User",
+			http.StatusBadRequest,
+			nil,
+		)
+	}
+
+	userId := strconv.FormatUint(uint64(user.ID), 10)
+	var claims = jwt.Claims{
+		UserID: userId,
+		Role:   "user",
+	}
+
+	jwtToken, err := s.jwtManager.Generate(claims)
+
+	if err != nil {
+		return "", "", errs.InternalError(err)
+	}
+
+	refreshTokenHash := uuid.NewString()
+
+	refreshToken := &authmodel.RefreshTokens{
+		UserID:    user.ID,
+		TokenHash: refreshTokenHash,
+		Device:    device,
+		IpAddress: ipAddress,
+		ExpiresAt: time.Now().Add(7 * 24 * time.Hour),
+	}
+
+	err = s.refreshTokenRepo.Create(refreshToken)
+
+	if err != nil {
+		return "", "", errs.InternalError(err)
+	}
+
+	return jwtToken, refreshTokenHash, nil
 }
 
 func (s *authService) ConfirmEmail(params *dto.ConfirmEmailRequest, device, ipAddress string) (string, string, error) {
