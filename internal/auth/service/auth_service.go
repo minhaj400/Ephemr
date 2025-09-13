@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -24,7 +25,7 @@ import (
 type AuthService interface {
 	SignUp(user *dto.SignUpRequest) (*model.User, error)
 	ConfirmEmail(params *dto.ConfirmEmailRequest, device, ipAddress string) (string, string, error)
-	RefreshToken(refreshToken, device, ipAddress string) (string, string, error)
+	RefreshToken(token, device, ipAddress string) (string, string, error)
 }
 
 type authService struct {
@@ -171,6 +172,7 @@ func (s *authService) ConfirmEmail(params *dto.ConfirmEmailRequest, device, ipAd
 		TokenHash: refreshTokenHash,
 		Device:    device,
 		IpAddress: ipAddress,
+		ExpiresAt: time.Now().Add(7 * 24 * time.Hour),
 	}
 
 	err = s.refreshTokenRepo.Create(refreshToken)
@@ -182,7 +184,72 @@ func (s *authService) ConfirmEmail(params *dto.ConfirmEmailRequest, device, ipAd
 	return jwtToken, refreshTokenHash, nil
 }
 
-func (s *authService) RefreshToken(refreshToken, device, ipAddress string) (string, string, error) {
+func (s *authService) RefreshToken(token, device, ipAddress string) (string, string, error) {
+	refreshToken, err := s.refreshTokenRepo.FindWithTokenDeviceIp(token, device, ipAddress)
 
-	return "", "", nil
+	println(refreshToken)
+
+	if err != nil {
+		return "", "", err
+	}
+
+	if refreshToken == nil {
+		return "", "", errs.New(
+			errors.TokenExpired,
+			"token expired",
+			http.StatusUnauthorized,
+			nil,
+		)
+	}
+
+	currentTime := time.Now()
+	isExpired := refreshToken.ExpiresAt.Before(currentTime)
+
+	if isExpired {
+		if err := s.refreshTokenRepo.DeleteById(refreshToken.ID); err != nil {
+			return "", "", errs.InternalError(err)
+		}
+
+		return "", "", errs.New(
+			errors.TokenExpired,
+			"token expired",
+			http.StatusUnauthorized,
+			nil,
+		)
+	}
+
+	user, err := s.userRepo.GetByID(refreshToken.UserID)
+
+	if err != nil {
+		return "", "", err
+	}
+
+	if user == nil {
+		return "", "", errs.BadRequest("Invalid Token", nil)
+	}
+
+	userId := strconv.FormatUint(uint64(user.ID), 10)
+	var claims = jwt.Claims{
+		UserID: userId,
+		Role:   "user",
+	}
+
+	jwtToken, err := s.jwtManager.Generate(claims)
+
+	if err != nil {
+		return "", "", errs.InternalError(err)
+	}
+
+	refreshTokenHash := uuid.NewString()
+
+	refreshToken.TokenHash = refreshTokenHash
+	refreshToken.ExpiresAt = time.Now().Add(7 * 24 * time.Hour)
+
+	err = s.refreshTokenRepo.Update(refreshToken)
+
+	if err != nil {
+		return "", "", errs.InternalError(err)
+	}
+
+	return jwtToken, refreshTokenHash, nil
 }
