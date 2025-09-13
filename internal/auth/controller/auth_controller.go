@@ -41,6 +41,30 @@ func (c *authController) SignUp(ctx *gin.Context) {
 	response.Success(ctx, "Verification Mail Sent", newUser)
 }
 
+func (c *authController) Login(ctx *gin.Context) {
+	var body dto.LoginRequest
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		response.HandleError(ctx, errs.FromValidation(err))
+		return
+	}
+
+	var device = ctx.GetHeader("user-agent")
+	var ipAddress = ctx.ClientIP()
+
+	token, refreshToken, err := c.authService.Login(&body, device, ipAddress)
+
+	if err != nil {
+		response.HandleError(ctx, err)
+		return
+	}
+
+	ctx.SetCookie("access_token", token, 900, "/", config.Cfg.HostName, false, false)
+
+	ctx.SetCookie("refresh_token", refreshToken, 7*24*3600, "/", config.Cfg.HostName, false, true)
+
+	response.Success(ctx, "Logged In Successfully", nil)
+}
+
 func (c *authController) ConfirmEmail(ctx *gin.Context) {
 	var params dto.ConfirmEmailRequest
 	if err := ctx.ShouldBindUri(&params); err != nil {
@@ -88,25 +112,4 @@ func (c *authController) RefreshToken(ctx *gin.Context) {
 	ctx.SetCookie("refresh_token", refreshToken, 7*24*3600, "/", config.Cfg.HostName, false, true)
 
 	response.Success(ctx, "Confirmed Email Successfully", nil)
-}
-
-func (c *authController) Login(ctx *gin.Context) {
-	var body dto.LoginRequest
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		response.HandleError(ctx, errs.FromValidation(err))
-		return
-	}
-
-	token, refreshToken, err := c.authService.Login(&body)
-
-	if err != nil {
-		response.HandleError(ctx, err)
-		return
-	}
-
-	ctx.SetCookie("access_token", token, 900, "/", config.Cfg.HostName, false, false)
-
-	ctx.SetCookie("refresh_token", refreshToken, 7*24*3600, "/", config.Cfg.HostName, false, true)
-
-	response.Success(ctx, "Logged In Successfully", nil)
 }
