@@ -18,7 +18,8 @@ type Module struct {
 func NewModule(r repositories.UserRepository, db *gorm.DB, h crypto.PasswordHasher, j jwt.TokenManager) *Module {
 	emailUtils := utils.NewAuthEmailUtils()
 	emailTokenRepo := repository.NewEmailTokenRepository(db)
-	srv := service.NewAuthService(r, emailUtils, emailTokenRepo, h, j)
+	refreshTokenRepo := repository.NewRefreshTokenRepo(db)
+	srv := service.NewAuthService(r, emailUtils, emailTokenRepo, h, j, refreshTokenRepo)
 	ctrl := controller.NewAuthController(srv)
 
 	return &Module{

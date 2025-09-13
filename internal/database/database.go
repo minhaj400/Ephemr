@@ -30,7 +30,11 @@ func ConnectDB() {
 		log.Fatal("Error Connecting To Database")
 	}
 
-	err = db.AutoMigrate(&user.User{}, &auth.EmailToken{})
+	err = db.AutoMigrate(
+		&user.User{},
+		&auth.EmailToken{},
+		&auth.RefreshTokens{},
+	)
 	if err != nil {
 		log.Fatal("failed to migrate database: ", err)
 	}

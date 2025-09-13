@@ -30,7 +30,7 @@ func NewJWTManager(secret string, ttl time.Duration) TokenManager {
 
 func (j *jwtManager) Generate(payload Claims) (string, error) {
 
-	payload.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Minute * 30))
+	payload.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Minute * 15))
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
 	return token.SignedString([]byte(j.secret))
