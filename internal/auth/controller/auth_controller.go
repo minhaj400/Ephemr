@@ -111,5 +111,5 @@ func (c *authController) RefreshToken(ctx *gin.Context) {
 
 	ctx.SetCookie("refresh_token", refreshToken, 7*24*3600, "/", config.Cfg.HostName, false, true)
 
-	response.Success(ctx, "Confirmed Email Successfully", nil)
+	response.Success(ctx, "Refreshed Successfully", nil)
 }
