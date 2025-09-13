@@ -1,10 +1,9 @@
 package controller
 
 import (
-	"fmt"
-
 	"github.com/Minhajxdd/Ephemr/internal/auth/dto"
 	services "github.com/Minhajxdd/Ephemr/internal/auth/service"
+	"github.com/Minhajxdd/Ephemr/internal/config"
 	"github.com/Minhajxdd/Ephemr/pkg/errs"
 	"github.com/Minhajxdd/Ephemr/pkg/response"
 	"github.com/gin-gonic/gin"
@@ -47,14 +46,19 @@ func (c *authController) ConfirmEmail(ctx *gin.Context) {
 		return
 	}
 
-	token, err := c.authService.ConfirmEmail(&params)
+	var device = ctx.GetHeader("user-agent")
+	var ipAddress = ctx.ClientIP()
+
+	token, refreshToken, err := c.authService.ConfirmEmail(&params, device, ipAddress)
 
 	if err != nil {
 		response.HandleError(ctx, err)
 		return
 	}
 
-	ctx.Header("Authorization", fmt.Sprintf("Bearer %s", token))
+	ctx.SetCookie("access_token", token, 900, "/", config.Cfg.HostName, false, false)
+
+	ctx.SetCookie("refresh_token", refreshToken, 7*24*3600, "/", config.Cfg.HostName, false, true)
 
 	response.Success(ctx, "Confirmed Email Successfully", nil)
 }
