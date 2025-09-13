@@ -12,6 +12,7 @@ import (
 type AuthController interface {
 	SignUp(ctx *gin.Context)
 	ConfirmEmail(ctx *gin.Context)
+	RefreshToken(ctx *gin.Context)
 }
 
 type authController struct {
@@ -61,4 +62,8 @@ func (c *authController) ConfirmEmail(ctx *gin.Context) {
 	ctx.SetCookie("refresh_token", refreshToken, 7*24*3600, "/", config.Cfg.HostName, false, true)
 
 	response.Success(ctx, "Confirmed Email Successfully", nil)
+}
+
+func (c *authController) RefreshToken(ctx *gin.Context) {
+
 }

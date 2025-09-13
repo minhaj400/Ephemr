@@ -10,5 +10,6 @@ func RegisterAuthRoutes(r *gin.RouterGroup, c controller.AuthController) {
 	{
 		auth.POST("/signup", c.SignUp)
 		auth.GET("/confirm-email/:userId/:token", c.ConfirmEmail)
+		auth.GET("/refresh", c.RefreshToken)
 	}
 }
