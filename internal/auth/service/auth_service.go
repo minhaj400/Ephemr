@@ -24,6 +24,7 @@ import (
 type AuthService interface {
 	SignUp(user *dto.SignUpRequest) (*model.User, error)
 	ConfirmEmail(params *dto.ConfirmEmailRequest, device, ipAddress string) (string, string, error)
+	RefreshToken(refreshToken, device, ipAddress string) (string, string, error)
 }
 
 type authService struct {
@@ -179,4 +180,9 @@ func (s *authService) ConfirmEmail(params *dto.ConfirmEmailRequest, device, ipAd
 	}
 
 	return jwtToken, refreshTokenHash, nil
+}
+
+func (s *authService) RefreshToken(refreshToken, device, ipAddress string) (string, string, error) {
+
+	return "", "", nil
 }
