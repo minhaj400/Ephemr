@@ -257,7 +257,13 @@ func (s *authService) ConfirmEmail(params *dto.ConfirmEmailRequest, device, ipAd
 }
 
 func (s *authService) RefreshToken(token, device, ipAddress string) (string, string, error) {
-	refreshToken, err := s.refreshTokenRepo.FindWithTokenDeviceIp(token, device, ipAddress)
+	findRefreshToken := &authmodel.RefreshTokens{
+		TokenHash: token,
+		Device:    device,
+		IpAddress: ipAddress,
+	}
+
+	refreshToken, err := s.refreshTokenRepo.Find(findRefreshToken)
 
 	if err != nil {
 		return "", "", err
