@@ -177,7 +177,14 @@ func (s *authService) Login(u *dto.LoginRequest, device, ipAddress string) (stri
 }
 
 func (s *authService) ConfirmEmail(params *dto.ConfirmEmailRequest, device, ipAddress string) (string, string, error) {
-	token, err := s.emailTokenRepo.IsValid(params.UserId, params.Token, authmodel.TokenKindVerify)
+	findToken := &authmodel.EmailToken{
+		UserID:    params.UserId,
+		TokenHash: params.Token,
+		Kind:      authmodel.TokenKindVerify,
+		Used:      false,
+	}
+
+	token, err := s.emailTokenRepo.Find(findToken)
 
 	if err != nil {
 		return "", "", errs.InternalError(err)
@@ -250,7 +257,13 @@ func (s *authService) ConfirmEmail(params *dto.ConfirmEmailRequest, device, ipAd
 }
 
 func (s *authService) RefreshToken(token, device, ipAddress string) (string, string, error) {
-	refreshToken, err := s.refreshTokenRepo.FindWithTokenDeviceIp(token, device, ipAddress)
+	findRefreshToken := &authmodel.RefreshTokens{
+		TokenHash: token,
+		Device:    device,
+		IpAddress: ipAddress,
+	}
+
+	refreshToken, err := s.refreshTokenRepo.Find(findRefreshToken)
 
 	if err != nil {
 		return "", "", err

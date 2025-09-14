@@ -18,8 +18,8 @@ type RefreshTokenRepository interface {
 	// DeleteById removes a refresh token record from the database by its ID.
 	DeleteById(id uint) error
 
-	// FindWithTokenDeviceIp retrieves a refresh token based on the token, device, and IP address.
-	FindWithTokenDeviceIp(token, device, ipAddress string) (*model.RefreshTokens, error)
+	// Find Record With Arguments
+	Find(rt *model.RefreshTokens) (*model.RefreshTokens, error)
 }
 
 type refreshTokenRepo struct {
@@ -52,17 +52,13 @@ func (r *refreshTokenRepo) DeleteById(id uint) error {
 	return nil
 }
 
-func (r *refreshTokenRepo) FindWithTokenDeviceIp(token, device, ipAddress string) (*model.RefreshTokens, error) {
-	var rt model.RefreshTokens
-	if err := r.db.Where(&model.RefreshTokens{
-		TokenHash: token,
-		Device:    device,
-		IpAddress: ipAddress,
-	}).First(&rt).Error; err != nil {
+func (r *refreshTokenRepo) Find(rt *model.RefreshTokens) (*model.RefreshTokens, error) {
+	var t model.RefreshTokens
+	if err := r.db.Where(rt).First(&t).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
 	}
-	return &rt, nil
+	return &t, nil
 }
