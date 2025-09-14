@@ -7,10 +7,18 @@ import (
 	"gorm.io/gorm"
 )
 
+// UserRepository defines the methods for interacting with user table in the database.
 type UserRepository interface {
+	// Create a new user record in the database.
 	Create(user *model.User) error
+
+	// FindByEmail retrieves a user record based on their email address.
 	FindByEmail(email string) (*model.User, error)
+
+	// GetByID retrieves a user record by their unique ID.
 	GetByID(id uint) (*model.User, error)
+
+	// SetVerifyStatus updates the verification status of a user's record.
 	SetVerifyStatus(id uint, status bool) (*model.User, error)
 }
 

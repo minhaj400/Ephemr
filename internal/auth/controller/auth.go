@@ -9,10 +9,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// AuthController defines the methods for handling user authentication.
 type AuthController interface {
+	// SignUp handles user registration.
 	SignUp(ctx *gin.Context)
+
+	// ConfirmEmail handles the confirmation of a user's email address.
 	ConfirmEmail(ctx *gin.Context)
+
+	// RefreshToken handles the renewal of access tokens using a refresh token.
 	RefreshToken(ctx *gin.Context)
+
+	// Login handles user authentication.
 	Login(ctx *gin.Context)
 }
 

@@ -7,9 +7,16 @@ import (
 	"gorm.io/gorm"
 )
 
+// EmailTokenRepository defines the methods for interacting with email tokens table in the database.
 type EmailTokenRepository interface {
+	// Create persists a new email token.
 	Create(user *model.EmailToken) error
+
+	// IsValid checks if a given user ID and token hash correspond to a valid email token of a specific kind.
+	// It returns the found EmailToken if valid, otherwise an error.
 	IsValid(userId uint, tokenHash string, kind model.TokenKind) (*model.EmailToken, error)
+
+	// DeleteById removes an email token from storage given its ID.
 	DeleteById(id uint) error
 }
 
@@ -42,17 +49,11 @@ func (r *emailTokenRepo) IsValid(userId uint, tokenHash string, kind model.Token
 }
 
 func (r *emailTokenRepo) DeleteById(id uint) error {
-    result := r.db.Delete(&model.EmailToken{}, id)
+	result := r.db.Delete(&model.EmailToken{}, id)
 
-    if result.Error != nil {
-        return result.Error
-    }
+	if result.Error != nil {
+		return result.Error
+	}
 
-    if result.RowsAffected == 0 {
-        return nil
-    }
-
-    return nil
+	return nil
 }
-
-
