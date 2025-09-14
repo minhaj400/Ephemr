@@ -7,10 +7,18 @@ import (
 	"gorm.io/gorm"
 )
 
+// RefreshTokenRepository defines the methods for interacting with refresh tokens table in the database.
 type RefreshTokenRepository interface {
+	// Create a new refresh token in the database.
 	Create(rt *model.RefreshTokens) error
+
+	// Updates an existing refresh token record in the database.
 	Update(rt *model.RefreshTokens) error
+
+	// DeleteById removes a refresh token record from the database by its ID.
 	DeleteById(id uint) error
+
+	// FindWithTokenDeviceIp retrieves a refresh token based on the token, device, and IP address.
 	FindWithTokenDeviceIp(token, device, ipAddress string) (*model.RefreshTokens, error)
 }
 

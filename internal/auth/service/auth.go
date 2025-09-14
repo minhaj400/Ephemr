@@ -22,10 +22,18 @@ import (
 	"github.com/google/uuid"
 )
 
+// AuthService defines the methods for handling the business logic of user authentication.
 type AuthService interface {
+	// SignUp handles the business logic for user registration, including creating a user record & sending confirmation mail.
 	SignUp(user *dto.SignUpRequest) (*model.User, error)
+
+	// ConfirmEmail handles the business logic for confirming a user's email address.
 	ConfirmEmail(params *dto.ConfirmEmailRequest, device, ipAddress string) (string, string, error)
+
+	// RefreshToken handles the business logic for refreshing access tokens.
 	RefreshToken(token, device, ipAddress string) (string, string, error)
+
+	// Login handles the business logic for user login, including credential validation.
 	Login(user *dto.LoginRequest, device, ipAddress string) (string, string, error)
 }
 

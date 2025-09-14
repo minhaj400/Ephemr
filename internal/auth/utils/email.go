@@ -7,8 +7,12 @@ import (
 	"github.com/Minhajxdd/Ephemr/internal/config"
 )
 
+// AuthEmailUtils defines the methods for handling email-related utility functions for authentication.
 type AuthEmailUtils interface {
+	// buildConfirmEmailBody generates the html body of the confirmation email using a magic link.
 	buildConfirmEmailBody(magicLink string) string
+
+	// SentConfirmEmail sends a confirmation email to the specified address.
 	SentConfirmEmail(to, magicLink string) error
 }
 
