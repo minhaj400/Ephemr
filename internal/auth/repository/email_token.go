@@ -12,9 +12,8 @@ type EmailTokenRepository interface {
 	// Create persists a new email token.
 	Create(user *model.EmailToken) error
 
-	// IsValid checks if a given user ID and token hash correspond to a valid email token of a specific kind.
-	// It returns the found EmailToken if valid, otherwise an error.
-	IsValid(userId uint, tokenHash string, kind model.TokenKind) (*model.EmailToken, error)
+	// Find Record With Arguments
+	Find(ek *model.EmailToken) (*model.EmailToken, error)
 
 	// DeleteById removes an email token from storage given its ID.
 	DeleteById(id uint) error
@@ -32,14 +31,9 @@ func (r *emailTokenRepo) Create(u *model.EmailToken) error {
 	return r.db.Create(u).Error
 }
 
-func (r *emailTokenRepo) IsValid(userId uint, tokenHash string, kind model.TokenKind) (*model.EmailToken, error) {
+func (r *emailTokenRepo) Find(ek *model.EmailToken) (*model.EmailToken, error) {
 	var t model.EmailToken
-	if err := r.db.Where(&model.EmailToken{
-		UserID:    userId,
-		TokenHash: tokenHash,
-		Kind:      kind,
-		Used:      false,
-	}).First(&t).Error; err != nil {
+	if err := r.db.Where(ek).First(&t).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
