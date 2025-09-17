@@ -4,16 +4,19 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
 type Config struct {
-	Port         string
-	JwtSecret    string
-	JwtTTl       time.Duration
-	HostName     string
-	GmailId      string
-	GmailAppPass string
+	Port            string
+	JwtSecret       string
+	JwtTTl          time.Duration
+	HostName        string
+	GmailId         string
+	GmailAppPass    string
+	Allowed_Origins []string
+
 	Database
 }
 
@@ -35,6 +38,8 @@ func Init() {
 		GmailId:      os.Getenv("GMAIL_ID"),
 		GmailAppPass: os.Getenv("GMAIL_APP_PASS"),
 		HostName:     os.Getenv("HOST_NAME"),
+
+		Allowed_Origins: strings.Split(os.Getenv("ALLOWED_ORIGINS"), ","),
 		Database: Database{
 			DB_USER:     os.Getenv("DB_USER"),
 			DB_PWD:      os.Getenv("DB_PWD"),

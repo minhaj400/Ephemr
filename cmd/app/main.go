@@ -4,6 +4,7 @@ import (
 	"github.com/Minhajxdd/Ephemr/internal/app"
 	"github.com/Minhajxdd/Ephemr/internal/config"
 	"github.com/Minhajxdd/Ephemr/internal/database"
+	"github.com/Minhajxdd/Ephemr/internal/middleware"
 	"github.com/Minhajxdd/Ephemr/internal/routes"
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +16,7 @@ func main() {
 
 	router := gin.New()
 	router.Use(gin.Logger())
+	router.Use(middleware.CORS(config.Cfg.Allowed_Origins))
 
 	c := app.NewContainer()
 
