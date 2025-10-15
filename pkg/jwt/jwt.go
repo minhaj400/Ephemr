@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Minhajxdd/Ephemr/internal/config"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -29,8 +30,7 @@ func NewJWTManager(secret string, ttl time.Duration) TokenManager {
 }
 
 func (j *jwtManager) Generate(payload Claims) (string, error) {
-
-	payload.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Minute * 15))
+	payload.ExpiresAt = jwt.NewNumericDate(time.Now().Add(config.Cfg.JwtTTl))
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
 	return token.SignedString([]byte(j.secret))
