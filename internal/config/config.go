@@ -1,12 +1,16 @@
 package config
 
 import (
+	"log"
 	"os"
+	"strconv"
+	"time"
 )
 
 type Config struct {
 	Port         string
 	JwtSecret    string
+	JwtTTl       time.Duration
 	HostName     string
 	GmailId      string
 	GmailAppPass string
@@ -27,6 +31,7 @@ func Init() {
 	Cfg = &Config{
 		Port:         os.Getenv("PORT"),
 		JwtSecret:    os.Getenv("JWT_SECRET"),
+		JwtTTl:       getJwtTTl(),
 		GmailId:      os.Getenv("GMAIL_ID"),
 		GmailAppPass: os.Getenv("GMAIL_APP_PASS"),
 		HostName:     os.Getenv("HOST_NAME"),
@@ -42,4 +47,18 @@ func Init() {
 	if Cfg.Port == "" {
 		Cfg.Port = "8080"
 	}
+}
+
+func getJwtTTl() time.Duration {
+	jwtTTLStr := os.Getenv("JWT_TTL")
+	if jwtTTLStr == "" {
+		log.Fatal("JWT_TTL environment variable is required")
+	}
+
+	jwtTTLInt, err := strconv.Atoi(jwtTTLStr)
+	if err != nil {
+		log.Fatalf("Invalid JWT_TTL value: %v", err)
+	}
+
+	return time.Minute * time.Duration(jwtTTLInt)
 }
